@@ -35,7 +35,11 @@ export const ProductDetail: React.FC = () => {
 
   const handleWhatsapp = () => {
     const text = `Hola FRS! Me interesa el producto: ${product.name}. ¿Tienen disponibilidad en ${selectedBranch?.name || 'la sucursal'}?`;
-    window.open(`https://wa.me/${selectedBranch ? selectedBranch.phone.replace(/\D/g,'') : ''}?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(
+      `https://wa.me/${selectedBranch ? selectedBranch.phone.replace(/\D/g, '') : ''}?text=${encodeURIComponent(text)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
   };
 
   return (

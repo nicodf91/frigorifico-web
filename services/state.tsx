@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Branch, Cart, CartItem, Product, UserProfile } from '../types';
 
 interface StateContextType {
@@ -16,96 +15,125 @@ interface StateContextType {
   updateUserProfile: (data: Partial<UserProfile>) => void;
 }
 
+const BRANCH_STORAGE_KEY = 'frs_selected_branch_v1';
+const CART_STORAGE_KEY = 'frs_cart_v1';
+const EMPTY_CART: Cart = { items: [], branchId: null };
+const EMPTY_PROFILE: UserProfile = {
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: '',
+  cuit: '',
+  businessName: '',
+  isWholesale: false,
+};
+
+function readStored<T>(key: string, validate: (value: unknown) => value is T, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed: unknown = JSON.parse(raw);
+    return validate(parsed) ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStored(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage can be unavailable or full; the in-memory demo must keep working.
+  }
+}
+
+function isBranch(value: unknown): value is Branch {
+  if (!value || typeof value !== 'object') return false;
+  const branch = value as Partial<Branch>;
+  return typeof branch.id === 'string' && typeof branch.name === 'string' && typeof branch.phone === 'string';
+}
+
+function isCartItem(value: unknown): value is CartItem {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as Partial<CartItem>;
+  return (
+    typeof item.productId === 'string' &&
+    typeof item.quantity === 'number' &&
+    Number.isFinite(item.quantity) &&
+    item.quantity > 0 &&
+    typeof item.price === 'number' &&
+    Number.isFinite(item.price) &&
+    typeof item.name === 'string'
+  );
+}
+
+function isCart(value: unknown): value is Cart {
+  if (!value || typeof value !== 'object') return false;
+  const cart = value as Partial<Cart>;
+  return Array.isArray(cart.items) && cart.items.every(isCartItem) && (cart.branchId === null || typeof cart.branchId === 'string');
+}
+
 const StateContext = createContext<StateContextType | undefined>(undefined);
 
 export const StateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(() => {
-    const saved = localStorage.getItem('frs_selected_branch');
-    return saved ? JSON.parse(saved) : null;
-  });
-
-  const [cart, setCart] = useState<Cart>(() => {
-    const saved = localStorage.getItem('frs_cart');
-    return saved ? JSON.parse(saved) : { items: [], branchId: null };
-  });
-
-  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem('frs_user_profile');
-    return saved ? JSON.parse(saved) : {
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      cuit: '',
-      businessName: '',
-      isWholesale: false
-    };
-  });
-
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(() =>
+    readStored(BRANCH_STORAGE_KEY, isBranch, null),
+  );
+  const [cart, setCart] = useState<Cart>(() => readStored(CART_STORAGE_KEY, isCart, EMPTY_CART));
+  // Personal data stays in memory only and disappears when the tab is reloaded.
+  const [userProfile, setUserProfile] = useState<UserProfile>(EMPTY_PROFILE);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     if (selectedBranch) {
-      localStorage.setItem('frs_selected_branch', JSON.stringify(selectedBranch));
+      writeStored(BRANCH_STORAGE_KEY, selectedBranch);
       if (cart.items.length === 0) {
-        setCart(prev => ({ ...prev, branchId: selectedBranch.id }));
+        setCart((previous) => ({ ...previous, branchId: selectedBranch.id }));
       }
     }
-  }, [selectedBranch]);
+  }, [selectedBranch, cart.items.length]);
 
   useEffect(() => {
-    localStorage.setItem('frs_cart', JSON.stringify(cart));
+    writeStored(CART_STORAGE_KEY, cart);
   }, [cart]);
-
-  useEffect(() => {
-    localStorage.setItem('frs_user_profile', JSON.stringify(userProfile));
-  }, [userProfile]);
 
   const selectBranch = (branch: Branch) => {
     setSelectedBranch(branch);
-    if (cart.items.length > 0 && cart.branchId !== branch.id) {
-      // Silent clear or logic here if needed, currently handling in UI or previous logic
-      setCart({ items: [], branchId: branch.id });
-    } else {
-       setCart(prev => ({ ...prev, branchId: branch.id }));
-    }
+    setCart((previous) =>
+      previous.items.length > 0 && previous.branchId !== branch.id
+        ? { items: [], branchId: branch.id }
+        : { ...previous, branchId: branch.id },
+    );
   };
 
   const addToCart = (product: Product, quantity: number) => {
-    if (!selectedBranch) {
-      return;
-    }
+    if (!selectedBranch || !Number.isFinite(quantity) || quantity <= 0) return;
 
-    setCart(prev => {
-      const existingItem = prev.items.find(i => i.productId === product.id);
-      let newItems;
-      if (existingItem) {
-        newItems = prev.items.map(i => 
-          i.productId === product.id 
-            ? { ...i, quantity: i.quantity + quantity } 
-            : i
-        );
-      } else {
-        newItems = [...prev.items, {
-          productId: product.id,
-          quantity,
-          unit: product.unit,
-          price: product.price,
-          name: product.name,
-          image: product.image
-        }];
-      }
-      return { ...prev, items: newItems, branchId: selectedBranch.id };
+    setCart((previous) => {
+      const existingItem = previous.items.find((item) => item.productId === product.id);
+      const items = existingItem
+        ? previous.items.map((item) =>
+            item.productId === product.id ? { ...item, quantity: item.quantity + quantity } : item,
+          )
+        : [
+            ...previous.items,
+            {
+              productId: product.id,
+              quantity,
+              unit: product.unit,
+              price: product.price,
+              name: product.name,
+              image: product.image,
+            },
+          ];
+      return { ...previous, items, branchId: selectedBranch.id };
     });
     setIsCartOpen(true);
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prev => ({
-      ...prev,
-      items: prev.items.filter(i => i.productId !== productId)
-    }));
+    setCart((previous) => ({ ...previous, items: previous.items.filter((item) => item.productId !== productId) }));
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -113,34 +141,33 @@ export const StateProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       removeFromCart(productId);
       return;
     }
-    setCart(prev => ({
-      ...prev,
-      items: prev.items.map(i => i.productId === productId ? { ...i, quantity } : i)
+    setCart((previous) => ({
+      ...previous,
+      items: previous.items.map((item) => (item.productId === productId ? { ...item, quantity } : item)),
     }));
   };
 
-  const clearCart = () => {
-    setCart(prev => ({ ...prev, items: [] }));
-  };
-
+  const clearCart = () => setCart((previous) => ({ ...previous, items: [] }));
   const updateUserProfile = (data: Partial<UserProfile>) => {
-    setUserProfile(prev => ({ ...prev, ...data }));
+    setUserProfile((previous) => ({ ...previous, ...data }));
   };
 
   return (
-    <StateContext.Provider value={{
-      selectedBranch,
-      selectBranch,
-      cart,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      isCartOpen,
-      setIsCartOpen,
-      userProfile,
-      updateUserProfile
-    }}>
+    <StateContext.Provider
+      value={{
+        selectedBranch,
+        selectBranch,
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        isCartOpen,
+        setIsCartOpen,
+        userProfile,
+        updateUserProfile,
+      }}
+    >
       {children}
     </StateContext.Provider>
   );
@@ -148,8 +175,6 @@ export const StateProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 export const useApp = () => {
   const context = useContext(StateContext);
-  if (context === undefined) {
-    throw new Error('useApp must be used within a StateProvider');
-  }
+  if (context === undefined) throw new Error('useApp must be used within a StateProvider');
   return context;
 };

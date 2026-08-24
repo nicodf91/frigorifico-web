@@ -121,7 +121,7 @@ export const Profile: React.FC = () => {
     updateUserProfile(dataToSave);
     
     const msg = showWholesale 
-      ? 'Solicitud mayorista y datos guardados con éxito.' 
+      ? 'Datos actualizados para esta sesión de la demo.'
       : 'Datos personales actualizados con éxito.';
     
     setSuccessMsg(`${msg} Volviendo al inicio...`);
@@ -151,7 +151,7 @@ export const Profile: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-serif font-bold text-brand-light mb-2 text-center">Mi Perfil FRS</h1>
-      <p className="text-stone-400 text-center mb-8">Gestioná tus datos de contacto y preferencias de cuenta.</p>
+      <p className="text-stone-400 text-center mb-8">Los datos solo viven en memoria y se borran al recargar la demo.</p>
 
       <div className="bg-brand-gray border border-stone-800 rounded-xl p-6 md:p-8 shadow-xl">
         
