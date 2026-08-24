@@ -37,10 +37,10 @@ export const Checkout: React.FC = () => {
         <div className="bg-green-900/20 border border-green-800 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-10 h-10 text-green-500" />
         </div>
-        <h2 className="text-3xl font-serif font-bold text-brand-light mb-4">¡Pedido Recibido!</h2>
+        <h2 className="text-3xl font-serif font-bold text-brand-light mb-4">Apertura de WhatsApp solicitada</h2>
         <p className="text-stone-400 mb-8">
-          Gracias {formData.name}. Tu pedido ha sido enviado a la sucursal {selectedBranch?.name}.
-          Nos pondremos en contacto al {formData.phone} para confirmar.
+          El mensaje para {selectedBranch?.name} quedó preparado. Revisalo y envialo desde WhatsApp para iniciar la consulta;
+          esta demo no registra pedidos por sí sola.
         </p>
         <Button onClick={() => { setSubmitted(false); clearCart(); navigate('/'); }}>Volver al Inicio</Button>
       </div>
@@ -63,8 +63,12 @@ export const Checkout: React.FC = () => {
     msg += `\n*Total: $${total.toLocaleString()}*`;
     if(formData.comments) msg += `\nNota: ${formData.comments}`;
 
-    window.open(`https://wa.me/${selectedBranch.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
-    setSubmitted(true); // Optimistic success
+    window.open(
+      `https://wa.me/${selectedBranch.phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+    setSubmitted(true);
   };
 
   return (

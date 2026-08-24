@@ -96,10 +96,10 @@ export const Home: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {[
-            { icon: ShieldCheck, title: "Calidad Garantizada", desc: "Trazabilidad desde origen en todos nuestros productos de cerdo." },
-            { icon: Star, title: "Selección Premium", desc: "Fiambres y quesos seleccionados por expertos." },
-            { icon: Truck, title: "Logística Propia", desc: "Entregas rápidas cuidando la cadena de frío." },
-            { icon: MapPin, title: "Atención Local", desc: "Red de sucursales cerca de tu barrio." }
+            { icon: ShieldCheck, title: "Datos de demostración", desc: "Catálogo estático y explícitamente ficticio." },
+            { icon: Star, title: "Catálogo explorable", desc: "Filtros, detalle y disponibilidad simulada." },
+            { icon: Truck, title: "Flujo de entrega", desc: "Retiro o envío modelados solo en la interfaz." },
+            { icon: MapPin, title: "Selección de sucursal", desc: "El carrito mantiene coherencia con la sede elegida." }
           ].map((item, idx) => (
             <div key={idx} className="bg-brand-gray p-6 rounded-lg border border-stone-800 text-center hover:border-brand-gold/50 transition-colors">
               <item.icon className="w-10 h-10 text-brand-gold mx-auto mb-4" />
@@ -171,27 +171,18 @@ export const Home: React.FC = () => {
       {/* Wholesale & Newsletter */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid md:grid-cols-2 gap-8">
         <div className="bg-stone-900 border border-stone-800 rounded-xl p-8 flex flex-col justify-center items-start">
-          <h3 className="text-2xl font-serif font-bold text-brand-light mb-4">Ventas Mayoristas</h3>
+          <h3 className="text-2xl font-serif font-bold text-brand-light mb-4">Flujo mayorista de demo</h3>
           <p className="text-stone-400 mb-6">
-            ¿Tenés un restaurante o comercio? Accedé a precios especiales y atención personalizada para tu negocio.
+            Explorá cómo una cuenta comercial podría capturar preferencias sin enviar ni persistir datos personales.
           </p>
-          <Button variant="outline" onClick={() => navigate('/perfil?tab=wholesale')}>Solicitar cuenta mayorista</Button>
+          <Button variant="outline" onClick={() => navigate('/perfil?tab=wholesale')}>Probar el flujo</Button>
         </div>
         <div className="bg-brand-gold rounded-xl p-8 flex flex-col justify-center items-start text-brand-black">
-          <h3 className="text-2xl font-serif font-bold mb-4">¡No te pierdas nada!</h3>
+          <h3 className="text-2xl font-serif font-bold mb-4">Proyecto de portfolio</h3>
           <p className="mb-6 opacity-90 font-medium">
-            Suscribite para recibir ofertas semanales y descuentos exclusivos en tu email.
+            Recorré selección de sucursal, catálogo, carrito y preparación de consultas en una sola experiencia frontend.
           </p>
-          <div className="flex w-full gap-2">
-            <input 
-              type="email" 
-              placeholder="Tu email" 
-              className="flex-1 px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-black/20 bg-white/90"
-            />
-            <button className="bg-brand-black text-brand-gold px-6 py-2 rounded-md font-bold hover:bg-stone-900 transition-colors">
-              Enviar
-            </button>
-          </div>
+          <Button onClick={() => navigate('/productos')}>Explorar catálogo</Button>
         </div>
       </section>
     </div>

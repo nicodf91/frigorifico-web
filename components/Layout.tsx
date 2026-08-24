@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, MapPin, Menu, X, Search, User, Instagram, Facebook, Phone, ShoppingBag, Trash2 } from 'lucide-react';
+import { ShoppingCart, MapPin, Menu, X, Search, User, ShoppingBag, Trash2 } from 'lucide-react';
 import { useApp } from '../services/state';
 import { Button, Stepper } from './Shared';
 import { WhatsAppButton } from './WhatsAppButton';
@@ -245,13 +245,7 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-serif font-bold text-brand-gold mb-4">FRS Online</h3>
-            <p className="text-stone-400 text-sm mb-4">
-              Calidad de frigorífico, directo a tu mesa. Especialistas en productos de cerdo, fiambres y delicatessen.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-stone-400 hover:text-brand-gold"><Instagram className="h-6 w-6" /></a>
-              <a href="#" className="text-stone-400 hover:text-brand-gold"><Facebook className="h-6 w-6" /></a>
-            </div>
+            <p className="text-stone-400 text-sm mb-4">Demo frontend con catálogo, carrito y consulta por WhatsApp.</p>
           </div>
 
           <div>
@@ -259,17 +253,15 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm text-stone-400">
               <li><Link to="/sucursales" className="hover:text-brand-gold">Nuestras Sucursales</Link></li>
               <li><Link to="/productos" className="hover:text-brand-gold">Catálogo</Link></li>
-              <li><a href="#" className="hover:text-brand-gold">Términos y Condiciones</a></li>
-              <li><a href="#" className="hover:text-brand-gold">Ayuda / Preguntas Frecuentes</a></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-lg font-bold text-brand-light mb-4">Contacto</h3>
+            <h3 className="text-lg font-bold text-brand-light mb-4">Alcance</h3>
             <ul className="space-y-2 text-sm text-stone-400">
-              <li className="flex items-center"><Phone className="h-4 w-4 mr-2 text-brand-gold" /> 0800-555-CERDO</li>
-              <li>info@frs-online.com</li>
-              <li>Atención al cliente: Lun a Vie 9 a 18hs</li>
+              <li>Sin backend ni pagos</li>
+              <li>Datos comerciales ficticios</li>
+              <li>Sin persistencia de información personal</li>
             </ul>
           </div>
         </div>

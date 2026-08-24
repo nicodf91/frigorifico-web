@@ -19,6 +19,9 @@ const App: React.FC = () => {
           
           <Route path="/*" element={
             <Layout>
+              <div className="border-b border-amber-700/60 bg-amber-950/60 px-4 py-2 text-center text-xs text-amber-100">
+                Demo de portfolio: catálogo y precios ficticios; los pedidos solo se preparan para abrir WhatsApp.
+              </div>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/productos" element={<Catalog />} />
